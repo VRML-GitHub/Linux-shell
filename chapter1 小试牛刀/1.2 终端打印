@@ -1,0 +1,10 @@
+1.echo是用于终端打印的基本命令。
+  在默认情况下，echo在每次调用后会添加一个换行符。
+  $ echo "Welcome to Bash"
+  Welcome to Bash
+  只需要使用带双引号的文本，结合echo命令就可以将该文本在终端中打印出来。类似的，不带双引号的文本也可以得到同样的输出结果:
+  $ echo Welcome to Bash
+  Welcome to Bash
+  使用单引号也可以完成同样的任务:
+  $ echo 'text in quote'
+  这些方法看起来相似，但各有一些特殊用途和副作用。
