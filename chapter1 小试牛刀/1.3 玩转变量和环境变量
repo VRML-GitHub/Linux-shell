@@ -1,6 +1,6 @@
 1.预备知识
-  变量采用常见的命名方式进行命名。当一个应用程序执行的时候，它接收一组环境变量。可以使用env命令在终端中查看所有与此终端进程相关的环境变量。
-  对于每个进程，在其运行时的环境变量可以使用下面的命令来查看:
+  变量采用常见的命名方式进行命名。当一个应用程序执行的时候，它接收一组环境变量。可以使用env命令在终端中查看所有与此终端进程相关的环境变
+  量。对于每个进程，在其运行时的环境变量可以使用下面的命令来查看:
   cat /proc/$PID/environ
   其中，将PID设置成相关进程的进程ID(PID总是一个整数)。
   假设有一个叫做crond的应用程序正在运行。我们可以使用pgrep命令获得crond的进程ID:
@@ -8,8 +8,8 @@
   2013
   那么，你就可以通过以下命令获得与该进程相关的环境变量:
   $ cat /proc/2013/environ
-  上面介绍的命令返回一个包含环境变量以及对应变量值的列表。每一个变量以name=value的形式来描述，彼此之间由null字符(\0)分隔。如果你将\0替换成
-  \n，那么就可以将输出重新格式化，使得每一行显示一对variable=value。替换可以使用tr命令来实现:
+  上面介绍的命令返回一个包含环境变量以及对应变量值的列表。每一个变量以name=value的形式来描述，彼此之间由null字符(\0)分隔。如果你将\0替
+  换成\n，那么就可以将输出重新格式化，使得每一行显示一对variable=value。替换可以使用tr命令来实现:
   $ cat /proc/2013/environ | tr '\0' '\n'
 2.实战演练
   一个变量可以通过以下方式进行赋值:
@@ -31,4 +31,52 @@
   echo "We have $count ${fruit}(s)"
   输出如下:
   We have 5 apple(s)
-  环境变量是未在当前进程中定义，而从父进程中继承而来的变量。例如环境变量PATH
+  环境变量是未在当前进程中定义，而从父进程中继承而来的变量。例如环境变量MAIL，它定义了用户的标准邮件目录。
+  echo $MAIL
+  /var/spool/mail/root
+  export MAIL
+  export命令用来设置环境变量。至此之后，从当前shell脚本执行的任何程序都会继承这个变量。我们可以按照自己的需要，在执行的应用程序或者shell
+  脚本中导出特定的变量。在默认情况下，有很多标准环境变量可供shell使用。
+  PATH就是其中之一。通常，变量PATH包含:
+  $ echo $PATH
+  /usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+  再给出所要执行的命令后，shell自动在PATH环境变量所包含的目录列表中(各目录路径之间以冒号分隔)查找对应的可执行文件。$PATH通常定义在/etc/
+  environment或/etc/profile或~/.bashrc中。如果需要在PATH中添加一条新路径，可以使用:
+  export PATH="$PATH:/home/user/bin"
+  也可以使用
+  $ PATH="$PATH:/home/user/bin"
+  $ export PATH
+  这样，我们就将/home/user/bin添加到了PATH中。
+  还有一些众所周知的环境变量:HOME、PWD、USER、UID、SHELL等。
+3.补充内容
+  让我们再多看些有关普通变量和环境变量的技巧。
+  (1)获取字符串长度
+     可以用下面的方法获取变量值的长度:
+     length=${#var}
+     例如:
+     $ var=1234567890
+     $ echo ${#var}
+     10
+     length就是字符串所包含的字符数。
+  (2)识别当前的shell版本
+     可以用下面的方法获知当前使用的是哪种shell:
+     echo $SHELL
+     /bin/bash
+     也可以用
+     echo $0
+     -bash
+  (3)检查是否为超级用户
+     UID是一个重要的环境变量，可以用于检查当前脚本是以超级用户还是普通用户的身份运行的。例如:
+     if [ $UID -ne 0 ];then
+     echo "Non root user.Please run as root."
+     else
+     echo "Root user"
+     fi
+     root用户的UID是0.
+  (4)修改Bash提示字符串(username@hostname:~$)
+     当我们打开一个终端或是运行一个shell，都会看到类似于user@hostname:/home/$的提示字符串。不同GUN/Linux发布版本中的提示及颜色也略有不
+     同。我们可以利用PS1环境变量定制提示文本。默认的shell提示文本是在文件~/.bashrc中的某一行设置的。
+     可以修改配置文件~/.bashrc中PS1的值修改提示字符串
+     可以修改PS1变量的值修改提示字符串
+     可以利用类似\e[1;31的特定转义序列来设置彩色的提示字符串(参考1.2节的内容)。
+     还有一些特殊的字符可以扩展成系统参数。例如:\u可以扩展为用户名，\h可以扩展为主机名，而\w可以扩展为当前工作目录。
