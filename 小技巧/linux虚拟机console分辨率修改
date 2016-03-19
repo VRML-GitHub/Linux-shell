@@ -1,0 +1,2 @@
+   一般安装完linux后默认的kernel给的tty分辨率是非常有限的,解决的方法就是给kernel传递VGA参数。对应的要修改的配置文件为 /etc/grub.conf,　
+就是在grub.conf启动列表的kernel最后添加vga参数。修改完成后需要reboot使其生效。
